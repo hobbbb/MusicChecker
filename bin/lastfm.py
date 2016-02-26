@@ -20,14 +20,14 @@ def ImportLibrary():
 
         lf_artists = res['lfm']['artists']['artist']
         for lfa in lf_artists:
-            name = lfa['name']
-            mbid = lfa['mbid'] or ''
+            name = lfa.get('name', '')
+            mbid = lfa.get('mbid', '')
 
             artist = Artist.objects.filter(name=name)
             if len(artist) == 1:
                 print 'Update: ' + name
-                # artist.mbid = lfa['mbid']
-                # artist.save()
+                artist[0].mbid = mbid
+                artist[0].save()
             elif len(artist) == 0:
                 print 'Add: ' + name
                 artist = Artist(
