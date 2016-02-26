@@ -4,6 +4,7 @@ from django.db import models
 class Artist(models.Model):
     name = models.CharField(verbose_name=u'Название', max_length=100, unique=True)
     lastfm_check = models.BooleanField(verbose_name=u'Совпадение с Last.fm', default=0)
+    mbid = models.CharField(verbose_name=u'mbid', max_length=100, default='')
 
     def __unicode__(self):
         return self.name

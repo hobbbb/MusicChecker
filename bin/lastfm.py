@@ -3,25 +3,45 @@
 import os
 import sys
 import django
-import urllib
 import time
-import xml.etree.ElementTree
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'music.settings'
 django.setup()
 
+import music.collection.LastFmApi
 from music.collection.models import Artist, Album
 
-"""
-Application name    hobbbb app
-API key 5c6346142584adb62a03f005a8fab87a
-Shared secret   19677377de7cf8f9cec47f884925d18d
-Registered to   Holbutla
-"""
+def ImportLibrary():
+    res = music.collection.LastFmApi.library_get_artists(user='Holbutla', page=1000)
+    pages_cnt = res['lfm']['artists']['@totalPages']
+    for p in range(1, int(pages_cnt) + 1):
+        res = music.collection.LastFmApi.library_get_artists(user='Holbutla', page=p)
 
-api_url = 'http://ws.audioscrobbler.com/2.0/?user=Holbutla&api_key=5c6346142584adb62a03f005a8fab87a&'
+        lf_artists = res['lfm']['artists']['artist']
+        for lfa in lf_artists:
+            name = lfa['name']
+            mbid = lfa['mbid'] or ''
 
+            artist = Artist.objects.filter(name=name)
+            if len(artist) == 1:
+                print 'Update: ' + name
+                # artist.mbid = lfa['mbid']
+                # artist.save()
+            elif len(artist) == 0:
+                print 'Add: ' + name
+                artist = Artist(
+                    name=name,
+                    mbid=mbid,
+                    lastfm_check=1,
+                )
+                artist.save()
+            else:
+                print 'Error: ' + name
+
+ImportLibrary()
+
+"""
 def CheckArtists():
     artists = Artist.objects.filter(lastfm_check=0)
     for art in artists:
@@ -64,5 +84,7 @@ def CheckAlbums():
 
         time.sleep(2)
 
-CheckArtists()
-CheckAlbums()
+# CheckArtists()
+# CheckAlbums()
+"""
+
