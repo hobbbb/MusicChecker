@@ -36,8 +36,8 @@ def _request(method, params):
 def library_get_artists(user, page=1, limit=50):
     return _request(method='library.getArtists', params={ 'user': user, 'page': page, 'limit': limit })
 
-def artist_get_info(user):
-    return _request(method='artist.getInfo', params={ 'user': user })
+# def artist_get_info(user):
+#     return _request(method='artist.getInfo', params={ 'user': user })
 
-def album_get_info(user):
-    return _request(method='lbum.getInfo', params={ 'user': user })
+# def album_get_info(user):
+#     return _request(method='lbum.getInfo', params={ 'user': user })

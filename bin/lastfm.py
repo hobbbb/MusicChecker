@@ -9,14 +9,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'music.settings'
 django.setup()
 
-import music.collection.LastFmApi
+import music.API.LastFm
+import musicbrainzngs
+# import music.API.Musicbrainz
 from music.collection.models import Artist, Album
 
+musicbrainzngs.set_useragent(
+    "my_music_collection",
+    "0.1",
+)
+
 def ImportLibrary():
-    res = music.collection.LastFmApi.library_get_artists(user='Holbutla', page=1000)
+    res = music.API.LastFm.library_get_artists(user='Holbutla', page=1000)
     pages_cnt = res['lfm']['artists']['@totalPages']
     for p in range(1, int(pages_cnt) + 1):
-        res = music.collection.LastFmApi.library_get_artists(user='Holbutla', page=p)
+        res = music.API.LastFm.library_get_artists(user='Holbutla', page=p)
 
         lf_artists = res['lfm']['artists']['artist']
         for lfa in lf_artists:
@@ -39,7 +46,53 @@ def ImportLibrary():
             else:
                 print 'Error: ' + name
 
-ImportLibrary()
+def GetAlbumsOfArtist(artist_mbid):
+    artist = Artist.objects.filter(mbid=artist_mbid)
+    if len(artist) != 1:
+        return
+
+    # musicbrainzngs.get_release_group_by_id(id, includes=[], release_status=[], release_type=[])
+    res = musicbrainzngs.get_artist_by_id(artist_mbid, includes=['releases'])
+    print res
+
+    """
+    res = music.API.Musicbrainz.get_albums_by_artist(artist_mbid)
+    data = res.get('metadata', '')
+    if not data:
+        return
+
+    mb_albums = data['release-group-list']['release-group']
+    for mba in mb_albums:
+        name = mba.get('title', '')
+        date = mba.get('first-release-date', '')
+        album_mbid = mba.get('@id', '')
+
+        album = Album.objects.filter(artist=artist, mbid=album_mbid)
+        if len(album) == 1:
+            print 'Update: ' + name
+            album[0].mbid = album_mbid
+            album[0].year = ''
+            album[0].save()
+        elif len(album) == 0:
+            print 'Add: ' + name
+            album = Album(
+                artist=artist,
+                name=name,
+                year='',
+                mbid=album_mbid,
+                lastfm_check=1,
+            )
+            album.save()
+        else:
+            print 'Error: ' + name
+    """
+
+
+# ImportLibrary()
+GetAlbumsOfArtist('ef58d4c9-0d40-42ba-bfab-9186c1483edd')
+
+
+
 
 """
 def CheckArtists():

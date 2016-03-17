@@ -25,7 +25,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'music.collection'
+    'music.collection',
+    'music.API'
 )
 
 MIDDLEWARE_CLASSES = (

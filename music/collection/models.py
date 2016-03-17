@@ -13,6 +13,7 @@ class Album(models.Model):
     artist = models.ForeignKey('Artist', verbose_name=u'Артист')
     name   = models.CharField(verbose_name=u'Название', max_length=150)
     year   = models.CharField(verbose_name=u'Год', max_length=4, default='')
+    mbid   = models.CharField(verbose_name=u'mbid', max_length=100, default='')
     lastfm_check = models.BooleanField(verbose_name=u'Совпадение с Last.fm', default=0)
 
     def __unicode__(self):
